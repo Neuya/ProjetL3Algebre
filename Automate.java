@@ -11,18 +11,31 @@ public class Automate{
     this.etatsInitiaux = new ArrayList<>();
   }
 
+  public Automate(Etat etatInit)
+  {
+    this.etats=new ArrayList<>();
+    this.etatsInitiaux = new ArrayList<>();
+    this.etatsInitiaux.add(etatInit);
+    this.constructAutomate();
+  }
+
+  public Automate(List<Etat> etatsInit)
+  {
+    this.etats = new ArrayList<>();
+    this.etatsInitiaux = etatsInit;
+    this.constructAutomate();
+  }
+
   public void addEtat(Etat e)
   {
     this.etats.add(e);
   }
 
-  public void constructAutomate(List<Etat> etatsInit)
+  public void constructAutomate()
   {
-    this.etatsInitiaux = etatsInit;
-    for(int i=0;i<etatsInit.size();i++)
+    for(int i=0;i<this.etatsInitiaux.size();i++)
     {
-      //this.etats.add(etatsInit.get(i));
-      this.addAllSuivants(etatsInit.get(i));
+      this.addAllSuivants(etatsInitiaux.get(i));
     }
   }
 
