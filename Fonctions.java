@@ -26,26 +26,21 @@ public class Fonctions
   {
     Etat q1 = new Etat(1);
     Etat q2 = new Etat(2);
-    Etat q3 = new Etat(3);
-    Etat q4 = new Etat(4);
     for(char i='a';i<='z';i++)
     {
       q1.addSuivantTransition(i,q2);
       q2.addSuivantTransition(i,q2);
-      q3.addSuivantTransition(i,q2);
     }
     for(char j='0';j<='9';j++)
     {
-      q3.addSuivantTransition(j,q3);
-      q2.addSuivantTransition(j,q3);
+      q2.addSuivantTransition(j,q2);
     }
     q2.makeFinal();
-    q3.makeFinal();
     Automate automateI = new Automate(q1);
     return automateI;
   }
 
-  public static List<String> listKeyWords = Arrays.asList("program","end","while","for","begin","true","then","false","break","if","do","not","or","and","from");
+  public static List<String> listKeyWords = Arrays.asList("program","end.","while","for","begin","true","then","false","break","if","do","not","or","and","from");
 
   public static String TransformAlgo(Automate autoEntier,Automate autoIdent,String programme)
   {
@@ -56,14 +51,12 @@ public class Fonctions
     {
       //System.out.println(strTok.nextToken());
       stringCur = strTok.nextToken();
-
-      if(autoEntier.checkStr(stringCur))
+      if(!listKeyWords.contains(stringCur))
       {
-        stringCur = "entier";
-      }
-      else if(autoIdent.checkStr(stringCur) && !listKeyWords.contains(stringCur))
-      {
-        stringCur = "ident";
+        if(autoEntier.checkStr(stringCur))
+          stringCur = "entier";
+        else if(autoIdent.checkStr(stringCur))
+          stringCur = "ident";
       }
 
       stringRet += stringCur + " ";

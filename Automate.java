@@ -75,6 +75,7 @@ public class Automate{
       }
       else
       {
+        System.out.println("non reconnu");
         return false;
       }
     }
