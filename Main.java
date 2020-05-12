@@ -19,16 +19,16 @@ public class Main
       Grammaire gram = new Grammaire("S");
 
 
-      /*gram.defineTerm(Arrays.asList("a","b"));
+      gram.defineTerm(Arrays.asList("a","b"));
       gram.defineNonTerm(Arrays.asList("A","B","S"));
       Map<String,List<String>> mapTest = new HashMap<String,List<String>>();
       mapTest.put("S",Arrays.asList("AaAb","BbBa"));
       mapTest.put("A",Arrays.asList(epsi));
-      mapTest.put("B",Arrays.asList(epsi));*/
-      gram.defineTerm(Arrays.asList("a","b"));
-    //  gram.defineNonTerm(Arrays.asList("S"));
+      mapTest.put("B",Arrays.asList(epsi));
+      /*gram.defineTerm(Arrays.asList("a","b"));
+      gram.defineNonTerm(Arrays.asList("S",));
       Map<String,List<String>> mapTest = new HashMap<String,List<String>>();
-      mapTest.put("S",Arrays.asList("aSbS","bSaS",epsi));
+      mapTest.put("S",Arrays.asList("aSbS","bSaS",epsi));*/
 
       gram.defineReglesProd(mapTest);
       gram.calculPremier();

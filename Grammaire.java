@@ -1,4 +1,9 @@
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.stream.Collectors;
 
 public class Grammaire
 {
@@ -20,6 +25,7 @@ public class Grammaire
     ensPremier = new HashMap<String,List<String>>();
     ensSuivant = new HashMap<String,List<String>>();
 
+
   }
 
   public void addAxiome(String a)
@@ -34,6 +40,8 @@ public class Grammaire
 
   public void defineNonTerm(List<String> nt)
   {
+    if(nt.contains(axiome) && this.nonTermList.contains(axiome))
+      this.nonTermList.remove(axiome);
     this.nonTermList.addAll(nt);
     for(int i=0;i<this.nonTermList.size();i++)
       ensSuivant.put(nonTermList.get(i),new ArrayList<String>());
@@ -158,14 +166,22 @@ public class Grammaire
       return this.nonTermList.contains(s)?s:getFirstNonTerm(rule.substring(s.length()));
     }
 
+    public void addAllIfAbsent(List<String> listA,List<String> listB)
+    {
+      listA.addAll(listB.stream()
+                        .filter(o -> !listA.contains(o))
+                        .collect(Collectors.toList()));
+    }
+
+
+
     public void calculSuivant()
     {
+      ensSuivant.get(axiome).add("$");
       for(int i=0;i<this.nonTermList.size();i++)
       {
         String stringNt = this.nonTermList.get(i);
         List<String> prodNt = this.reglesProd.get(stringNt);
-        if(stringNt.equals(this.axiome))
-          ensSuivant.get(axiome).add("$");
 
         for(int j=0;j<prodNt.size();j++)
         {
@@ -175,12 +191,17 @@ public class Grammaire
             firstNT = getFirstNonTerm(prod);
             if(firstNT != null)
             {
-              List<String> sousPrem = calculSousPremier(prod);
-              if(!sousPrem.contains(epsilon))
-                this.ensSuivant.get(firstNT).addAll(sousPrem);
+              prod = prod.substring(prod.indexOf(firstNT)+firstNT.length());
+              List<String> sousPrem = new ArrayList<>();
+              if(!ensPremier.containsKey(prod))
+                sousPrem = calculSousPremier(prod);
               else
-                this.ensSuivant.get(firstNT).addAll(this.ensSuivant.get(stringNt));
-              prod = prod.substring(prod.indexOf(firstNT));
+                sousPrem = ensPremier.get(prod);
+              if(!sousPrem.contains(epsilon))
+                addAllIfAbsent(this.ensSuivant.get(firstNT),sousPrem);
+              else
+                addAllIfAbsent(this.ensSuivant.get(firstNT),this.ensSuivant.get(stringNt));
+
             }
           } while (firstNT!=null);
 
