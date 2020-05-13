@@ -309,6 +309,62 @@ public class Grammaire
       }
     }
 
+    public boolean analyseChaine(String chaine)
+    {
+      boolean appartient = true;
+      chaine = chaine+"$";
+      String pile = axiome+"$";
+      boolean dollarPileEtChaine = false; //booleen pour savoir si la chaine et la pile sont toutes les deux à $
+      while(appartient && !dollarPileEtChaine) //Tant que l'analyse n'a pas décidé de la non-appartenance
+      {
+          String firstTerm = getFirst(pile); //Premier terme de la pile (terminal ou non)
+          if(this.nonTermList.contains(firstTerm)) //Si le premier terme de la liste est un non-terminal
+          {
+            String firstTermChaine = chaine.equals("$")?"$":getFirst(chaine); //On prend le premier terme de la chaine
+            //System.out.println("Premier terme chaine : "+firstTermChaine);
+            if(this.termList.contains(firstTermChaine) || firstTermChaine.equals("$")) //Si ce terme appartient bien à la liste des terminaux
+            {
+              List<String> reglesProdNonTerm = this.reglesProd.get(firstTerm); //On récupère les règles de production du non Terminal
+              if(reglesProdNonTerm.contains(firstTermChaine)) //Si le terminal est compris dans les règles
+              {
+                pile = pile.replaceFirst(firstTerm,firstTermChaine); //On remplace la première occurence du non Terminal dans la pile par ce terminal
+              }
+              else
+              {
+                MyKey myKey = new MyKey(firstTerm,firstTermChaine);
+                //System.out.println(this.tableAnalyse.get(myKey));
+                if(this.tableAnalyse.containsKey(myKey)) //Si la table d'analyse contient bien une entrée pour le couple firstTerm  firstTermChaine
+                {
+                  String replacement = this.tableAnalyse.get(myKey);
+                  pile = pile.replaceFirst(firstTerm,this.tableAnalyse.get(myKey)); //Sinon on récupère le remplacement dans la table d'analyse
+                }
+                else //Le cas échéant, cette chaine n'appartient pas à L(Grammaire)
+                  appartient = false;
+              }
+            }
+            else //Le cas échéant, cette chaine n'appartient pas à L(Grammaire)
+              appartient = false;
+          }
+          else if(this.termList.contains(firstTerm) || (chaine.equals("$") && !pile.equals("$"))) //Sinon on vérifie que ce premier terme est bien un de nos terminaux
+          {
+            //Si oui, on dépile et on avance
+            if(!chaine.equals("$"))
+            {
+              pile=pile.substring(firstTerm.length());
+              chaine = chaine.substring(firstTerm.length());
+            }
+            else
+              appartient = false;
+          }
+          else if(pile.equals("$") && chaine.equals("$"))
+            dollarPileEtChaine = true;
+          else
+            appartient = false;
+      }
+
+      return appartient && dollarPileEtChaine;
+    }
+
 
 
   }

@@ -47,13 +47,45 @@ public class Main
       gram.printAllSuivant();
       gram.construireTableAnalyse();
       gram.printTableAnalyse();
+      System.out.println("ANALYSE : "+gram.analyseChaine("x*(x+1)+x"));
       Menu menu = new Menu();
+      /*Grammaire gram3 = new Grammaire("S");
+      try{
+        gram3 = menu.constructGrammaireFile();
+      }catch(Exception e)
+      {
+        e.printStackTrace();
+      }
+      gram3.calculPremier();
+      gram3.calculSuivant();
+      gram3.printAllSuivant();
       Grammaire gram2 = menu.constructGrammaire();
       gram2.printGrammaire();
       gram2.calculPremier();
       gram2.calculSuivant();
       gram2.printAllSuivant();
-    //  gram.printAllEnsPremier();
+    //  gram.printAllEnsPremier();*/
+      String choice = menu.makeChoice();
+      if(choice.equals("1"))
+      {
+        Grammaire gram2 = menu.constructGrammaire();
+      }
+      if(choice.equals("2"))
+      {
+        Grammaire gram3 = new Grammaire("");
+        try{
+          gram3 = menu.constructGrammaireFile();
+        }catch(Exception e)
+        {
+          e.printStackTrace();
+        }
+        gram3.calculPremier();
+        gram3.calculSuivant();
+        gram3.printAllSuivant();
+        gram3.construireTableAnalyse();
+        gram3.printTableAnalyse();
+        System.out.println("ANALYSE : "+gram3.analyseChaine("aabb"));
+      }
 
 
 

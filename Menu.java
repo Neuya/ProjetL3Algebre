@@ -3,6 +3,7 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Scanner;
+import java.io.*;
 
 public class Menu
 {
@@ -64,6 +65,53 @@ public class Menu
     } while (reponse.equals("y"));
 
     return rules;
+  }
+
+  public Grammaire constructGrammaireFile() throws Exception
+  {
+    File file = new File("Grammaire.txt");
+
+    BufferedReader br = new BufferedReader(new FileReader("Grammaire.txt"));
+
+    String line;
+    //axiome
+    String st = br.readLine();
+    Grammaire gram = new Grammaire(st);
+
+    List<String> listTerm = new ArrayList<>();
+    while(!st.equals("."))
+    {
+      st = br.readLine();
+      if(!st.equals("."))
+      listTerm.add(st);
+    }
+
+    List<String> listNonTerm = new ArrayList<>();
+    Map<String,List<String>> mapRegles = new HashMap<>();
+    st = br.readLine();
+    while(!st.equals(".end"))
+    {
+      String nTerm = st.replace(" ->","").replace("->","");
+      System.out.println("NTERM "+nTerm);
+      listNonTerm.add(nTerm);
+      st = br.readLine();
+      List<String> listRules = new ArrayList<>();
+      while(st.charAt(0)=='|')
+      {
+        String rule = st.substring(1).replace(" ","");
+        rule = rule.equals("epsilon")?Grammaire.epsilon:rule;
+        listRules.add(rule);
+        st=br.readLine();
+      }
+      mapRegles.put(nTerm,listRules);
+    }
+
+    gram.defineTerm(listTerm);
+    gram.defineNonTerm(listNonTerm);
+    gram.defineReglesProd(mapRegles);
+    System.out.println("GRAMMAIRE FICHIER");
+    gram.printGrammaire();
+    return gram;
   }
 
   public Grammaire constructGrammaire()

@@ -9,8 +9,15 @@ public class MyKey
       this.term = b;
     }
 
-    public boolean equals(MyKey m)
+    @Override
+    public int hashCode(){
+      return 1;
+    }
+
+    @Override
+    public boolean equals(Object o)
     {
+      MyKey m = (MyKey) o;
       return this.nonTerm.equals(m.nonTerm) && this.term.equals(m.term);
     }
 

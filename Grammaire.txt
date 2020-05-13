@@ -1,0 +1,11 @@
+S
+a
+b
+.
+S ->
+|aA
+|epsilon
+A ->
+|aSbb
+| epsilon
+.end
