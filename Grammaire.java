@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.stream.Collectors;
+import java.util.Set;
 
 public class Grammaire
 {
@@ -13,6 +14,7 @@ public class Grammaire
   private Map<String,List<String>> reglesProd;
   private Map<String,List<String>> ensPremier;
   private Map<String,List<String>> ensSuivant;
+  private Map<MyKey,String> tableAnalyse;
   public static final String epsilon = "";
 
   public Grammaire(String a)
@@ -24,8 +26,7 @@ public class Grammaire
     reglesProd = new HashMap<String,List<String>>();
     ensPremier = new HashMap<String,List<String>>();
     ensSuivant = new HashMap<String,List<String>>();
-
-
+    tableAnalyse = new HashMap<MyKey,String>();
   }
 
   public void addAxiome(String a)
@@ -80,7 +81,7 @@ public class Grammaire
       String t = ens.get(i).equals(epsilon)?"epsilon":ens.get(i);
       System.out.print(t+",");
     }
-    String t = ens.get(ens.size()-1).equals(epsilon)?"epsilon":ens.get(ens.size()-1);
+    String t = ens.get((ens.size()-1>0?ens.size()-1:0)).equals(epsilon)?"epsilon":ens.get(ens.size()-1);
     System.out.println(t+"}");
   }
 
@@ -124,9 +125,35 @@ public class Grammaire
       {
           String prod = prodNt.get(k);
           ensNt.addAll(calculSousPremier(prod));
+          this.ensPremier.put(prod,calculSousPremier(prod));
       }
         printEnsPremier(stringNt,ensNt);
         this.ensPremier.put(stringNt,ensNt);
+      }
+    }
+
+    public void printGrammaire()
+    {
+      System.out.println("Grammaire : ");
+      System.out.println("Terminaux : ");
+      for(String s : this.termList)
+      {
+        System.out.println(s);
+      }
+      System.out.println("Non terminaux");
+      for(String s: this.nonTermList)
+      {
+        System.out.println(s);
+      }
+      System.out.println("Axiome : "+axiome);
+      System.out.println("Regles : ");
+      for(String s: this.nonTermList)
+      {
+        System.out.println(s+"->");
+        for(String rule : this.reglesProd.get(s))
+        {
+          System.out.println("| "+(rule.equals(epsilon)?"epsilon":rule));
+        }
       }
     }
 
@@ -135,14 +162,26 @@ public class Grammaire
       List<String> ensReturn = new ArrayList<String>();
       if(!rule.equals(epsilon))
       {
-
         List<String> premierFirst = new ArrayList<String>();
         int sizeToCut = -1;
 
         do {
 
           String firstTerm = this.getFirst(rule);
-          premierFirst = ensPremier.get(firstTerm);
+          do {
+            premierFirst = ensPremier.get(firstTerm);
+            if(premierFirst==null)
+            {
+              List<String> intermediate = new ArrayList<>();
+              for(String regles : this.reglesProd.get(firstTerm))
+              {
+                intermediate.addAll(calculSousPremier(regles));
+              }
+              this.ensPremier.put(firstTerm,intermediate);
+            }
+          } while (premierFirst==null);
+
+
           ensReturn.addAll(premierFirst);
           sizeToCut = firstTerm.length();
           rule = rule.substring(sizeToCut);
@@ -166,46 +205,107 @@ public class Grammaire
       return this.nonTermList.contains(s)?s:getFirstNonTerm(rule.substring(s.length()));
     }
 
-    public void addAllIfAbsent(List<String> listA,List<String> listB)
+    public boolean addAllIfAbsent(List<String> listA,List<String> listB)
     {
+      boolean ret = false;
+      for(String s : listB)
+      {
+        if(!listA.contains(s))
+          ret = true;
+      }
+
+      if(!ret)
+        return false;
+
       listA.addAll(listB.stream()
                         .filter(o -> !listA.contains(o))
                         .collect(Collectors.toList()));
+
+      return true;
     }
+
 
 
 
     public void calculSuivant()
     {
       ensSuivant.get(axiome).add("$");
-      for(int i=0;i<this.nonTermList.size();i++)
-      {
-        String stringNt = this.nonTermList.get(i);
-        List<String> prodNt = this.reglesProd.get(stringNt);
+      boolean termToAdd = true;
+      do{
+          for(int i=0;i<this.nonTermList.size();i++)
+          {
+            String stringNt = this.nonTermList.get(i);
+            List<String> prodNt = this.reglesProd.get(stringNt);
 
-        for(int j=0;j<prodNt.size();j++)
-        {
-          String prod = prodNt.get(j);
-          String firstNT = "";
-          do {
-            firstNT = getFirstNonTerm(prod);
-            if(firstNT != null)
+            for(int j=0;j<prodNt.size();j++)
             {
-              prod = prod.substring(prod.indexOf(firstNT)+firstNT.length());
-              List<String> sousPrem = new ArrayList<>();
-              if(!ensPremier.containsKey(prod))
-                sousPrem = calculSousPremier(prod);
-              else
-                sousPrem = ensPremier.get(prod);
-              if(!sousPrem.contains(epsilon))
-                addAllIfAbsent(this.ensSuivant.get(firstNT),sousPrem);
-              else
-                addAllIfAbsent(this.ensSuivant.get(firstNT),this.ensSuivant.get(stringNt));
-
+              String prod = prodNt.get(j);
+              String firstNT = "";
+              do {
+                firstNT = getFirstNonTerm(prod);
+                if(firstNT != null)
+                {
+                  prod = prod.substring(prod.indexOf(firstNT)+firstNT.length());
+                  List<String> sousPrem = new ArrayList<>();
+                  if(!ensPremier.containsKey(prod))
+                    sousPrem = calculSousPremier(prod);
+                  else
+                    sousPrem = ensPremier.get(prod);
+                  termToAdd = addAllIfAbsent(this.ensSuivant.get(firstNT),sousPrem);
+                  if(sousPrem.contains(epsilon) || prod.length()==0)
+                  {
+                    this.ensSuivant.get(firstNT).remove(epsilon);
+                    termToAdd = addAllIfAbsent(this.ensSuivant.get(firstNT),this.ensSuivant.get(stringNt));
+                  }
+                }
+              } while (firstNT!=null);
             }
-          } while (firstNT!=null);
+          }
 
+        }while(termToAdd);
+
+    }
+
+    public void printTableAnalyse()
+    {
+      Set<MyKey> keys = this.tableAnalyse.keySet();
+      for(String nTerm : this.nonTermList)
+      {
+        keys.stream()
+            .filter(t -> t.getNonTerm().equals(nTerm))
+            .forEach(r -> System.out.println(r.getNonTerm()+" | "+(r.getTerm().equals(epsilon)?"£":r.getTerm())+" --- "+(this.tableAnalyse.get(r).equals(epsilon)?"epsilon":this.tableAnalyse.get(r))));
       }
+    }
+
+    public void construireTableAnalyse()
+    {
+      for(String nTerm : this.nonTermList)
+      {
+        List<String> listProd = this.reglesProd.get(nTerm);
+        for(String prod: listProd)
+        {
+          List<String> premierProd = this.ensPremier.get(prod);
+          //printEnsPremier(prod,premierProd);
+          for(String terminal : premierProd)
+          {
+            if(!terminal.equals(epsilon))
+            {
+              MyKey key = new MyKey(nTerm,terminal);
+              this.tableAnalyse.put(key,prod);
+            }
+            if(premierProd.contains(epsilon))
+            {
+              for(String term : this.ensSuivant.get(nTerm))
+              {
+                //System.out.println("TERM "+term);
+                MyKey key2 = new MyKey(nTerm,term);
+                this.tableAnalyse.put(key2,prod);
+              }
+            }
+
+          }
+
+        }
       }
     }
 
