@@ -1,8 +1,12 @@
 import java.util.*;
 
+/*
+Classe représentant un état utile pour la classe Automate
+*/
 public class Etat
 {
-  private int num;
+  private int num; //Numéro de l'état
+  //Map servant à stocker les couples Character/Etat pour les différentes transitions
   private Map<Character,Etat> mapTransitionEtat;
   private boolean isFinal;
 
@@ -18,6 +22,11 @@ public class Etat
     this.mapTransitionEtat.put(t,e);
   }
 
+  /*
+    Retourne tous les états voisins
+    (ie) s'il existe une transition
+  */
+
   public List<Etat> getAllVoisins()
   {
     List<Etat> listRet = new ArrayList<Etat>();
@@ -27,6 +36,10 @@ public class Etat
     }
     return listRet;
   }
+
+  /*
+  Fonction pour savoir si un état est contenu dans une liste d'états
+  */
 
   public boolean isContained(List<Etat> list)
   {

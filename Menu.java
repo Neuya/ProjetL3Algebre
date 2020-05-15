@@ -115,6 +115,7 @@ public class Menu
       }
       choice = this.makeChoiceGrammaire();
     }
+    System.exit(1);
   }
 
   //Fonctions de menu (print..)
@@ -220,7 +221,7 @@ public class Menu
       List<String> listRules = new ArrayList<>();
       while(st.charAt(0)=='|')
       {
-        String rule = st.substring(1).replace(" ","");
+        String rule = st.substring(1).replaceAll(" ","");
         rule = rule.equals("epsilon")?Grammaire.epsilon:rule;
         listRules.add(rule);
         st=br.readLine();

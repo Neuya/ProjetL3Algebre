@@ -2,6 +2,7 @@ import java.util.*;
 
 public class Fonctions
 {
+  //Fonction pour construire un automate reconnaissant les entiers
   public static Automate makeAutomateEntier()
   {
     Etat e1 = new Etat(1);
@@ -21,7 +22,7 @@ public class Fonctions
     Automate automate = new Automate(e1);
     return automate;
   }
-
+  //Fonction pour construire un automate reconnaissant les identificateurs
   public static Automate makeAutomateIdent()
   {
     Etat q1 = new Etat(1);
@@ -40,8 +41,16 @@ public class Fonctions
     return automateI;
   }
 
+  //La liste des mots clés
   public static List<String> listKeyWords = Arrays.asList("program","end.","while","for","begin","true","then","false","break","if","do","not","or","and","from","end");
 
+
+  /**
+  *Fonction qui transforme un programme en une chaine analysable
+  *@return String le programme transformé
+  *@param autoEntier et autoIdent les deux automates
+  *@param String programme le programme à analyser
+  */
   public static String TransformAlgo(Automate autoEntier,Automate autoIdent,String programme)
   {
     StringTokenizer strTok = new StringTokenizer(programme);
@@ -59,7 +68,6 @@ public class Fonctions
         else if(autoIdent.checkStr(stringCur))
           stringCur = "ident";
       }
-
       stringRet += stringCur + " ";
     }
     return stringRet.replace(" ; ",";");

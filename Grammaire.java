@@ -8,15 +8,16 @@ import java.util.Set;
 
 public class Grammaire
 {
-  private List<String> termList;
-  private List<String> nonTermList;
-  private String axiome;
-  private Map<String,List<String>> reglesProd;
-  private Map<String,List<String>> ensPremier;
-  private Map<String,List<String>> ensSuivant;
-  private Map<MyKey,String> tableAnalyse;
-  public static final String epsilon = "";
+  private List<String> termList; //Liste des terminaux
+  private List<String> nonTermList; //Liste des non Terminaux
+  private String axiome; //Axiome
+  private Map<String,List<String>> reglesProd; //Regles de production
+  private Map<String,List<String>> ensPremier; //Ensembles premiers
+  private Map<String,List<String>> ensSuivant; //Ensembles suivants
+  private Map<MyKey,String> tableAnalyse; //Table d'analyse (voir MyKey.java)
+  public static final String epsilon = ""; //Utile pour lecture du code
 
+  //Constructeur
   public Grammaire(String a)
   {
     this.axiome = a;
@@ -29,6 +30,11 @@ public class Grammaire
     tableAnalyse = new HashMap<MyKey,String>();
   }
 
+  /*
+  ===============================
+  Constructeurs (initialisateurs)
+  ===============================
+  */
   public void addAxiome(String a)
   {
     this.axiome = a;
@@ -37,15 +43,6 @@ public class Grammaire
   public void defineTerm(List<String> t)
   {
     this.termList = t;
-  }
-
-  public void defineNonTerm2(List<String> nt)
-  {
-    if(nt.contains(axiome) && this.nonTermList.contains(axiome))
-      this.nonTermList.remove(axiome);
-    this.nonTermList.addAll(nt);
-    for(int i=0;i<this.nonTermList.size();i++)
-      ensSuivant.put(nonTermList.get(i),new ArrayList<String>());
   }
 
   public void defineNonTerm(List<String> nt)
@@ -65,96 +62,15 @@ public class Grammaire
     this.reglesProd = r;
   }
 
-  public List<String> getAllTermStartWith(String s)
-  {
-    return this.termList.stream()
-                        .filter(term -> term.startsWith(s))
-                        .collect(Collectors.toList());
-  }
+  /*
+  =================================
+  */
 
-  public List<String> getAllNonTermStartWith(String s)
-  {
-    return this.nonTermList.stream()
-                        .filter(term -> term.startsWith(s))
-                        .collect(Collectors.toList());
-  }
-
-  public boolean containsStartWith(String s,List<String> list)
-  {
-    return list.stream().filter(t -> t.startsWith(s)).collect(Collectors.toList()).size() > 0;
-  }
-
-  public String findGoodChoice(String s,List<String> choices)
-  {
-    int i=1;
-    boolean bool= true;
-    while(bool && i<s.length())
-    {
-      i++;
-      bool = containsStartWith(s.substring(0,i),choices);
-
-      //System.out.println("I"+i+" substring "+s.substring(0,i));
-    }
-    final int j = !bool?i-1:i;
-    // System.out.println("SUBSTRING "+s.substring(0,j));
-     String t = choices.stream()
-                       .filter(c -> c.equals(s.substring(0,j)))
-                       .findAny()
-                       .get();
-      //System.out.println("findGoodChoice returns "+t);
-      return t;
-  }
-
-  public String getFirst(String s)
-  {
-    List<String> listPossible = new ArrayList<>();
-    String inter = s;
-    //System.out.println("DANS GET FIRST "+inter);
-    if(s.length()>0)
-    {
-    listPossible = getAllTermStartWith(inter.substring(0,1));
-    if(listPossible.size()>1)
-    {
-      //System.out.println("On est bien lo1");
-      return findGoodChoice(inter,listPossible);
-    }else if(listPossible.size()==1)
-    {
-      return listPossible.get(0);
-    }
-
-    listPossible = getAllNonTermStartWith(inter.substring(0,1));
-    if(listPossible.size()>1)
-    {
-      //System.out.println("On est bien lo");
-      return findGoodChoice(inter,listPossible);
-    }
-    else if(listPossible.size()==1)
-    {
-      return listPossible.get(0);
-    }
-  }
-    return null;
-  }
-
-  public String getFirst2(String s)
-  {
-    for(int i=0;i<this.termList.size();i++)
-    {
-      if(s.startsWith(this.termList.get(i)))
-      {
-        return this.termList.get(i);
-      }
-    }
-    for(int i=0;i<this.nonTermList.size();i++)
-    {
-      if(s.startsWith(this.nonTermList.get(i)))
-      {
-        return this.nonTermList.get(i);
-      }
-    }
-    return null;
-  }
-
+  /*
+  ======================
+  Fonctions d'affichage
+  ======================
+  */
   public void printEnsPremier(String term,List<String> ens)
   {
     System.out.print("Premier("+term+") = {");
@@ -227,190 +143,181 @@ public class Grammaire
     System.out.println("");
   }
 
-  public void calculPremier2()
+  public void printTableAnalyse()
   {
-    for(int i=0;i<this.termList.size();i++)
-    {
-      String stringTerm = this.termList.get(i);
-      List<String> ens = new ArrayList<String>();
-      ens.add(stringTerm);
-      ensPremier.put(stringTerm,ens);
-    }
-    for(int j=0;j<this.nonTermList.size();j++)
-    {
-      String stringNt = this.nonTermList.get(j);
-      List<String> ensNt = new ArrayList<String>();
-      List<String> prodNt = this.reglesProd.get(stringNt);
-      for(int k=0;k<prodNt.size();k++)
+      System.out.println("\nTable d'analyse : \n");
+      Set<MyKey> keys = this.tableAnalyse.keySet();
+      for(String nTerm : this.nonTermList)
       {
-          String prod = prodNt.get(k);
-          ensNt.addAll(calculSousPremier3(prod));
-          this.ensPremier.put(prod,calculSousPremier3(prod));
+        keys.stream()
+            .filter(t -> t.getNonTerm().equals(nTerm))
+            .forEach(r -> System.out.println(r.getNonTerm()+" | "+(r.getTerm().equals(epsilon)?"£":r.getTerm())+" --- "+(this.tableAnalyse.get(r).equals(epsilon)?"epsilon":this.tableAnalyse.get(r))));
       }
-      this.ensPremier.put(stringNt,ensNt);
+      System.out.println("");
+      String[][] tableAnalyseTab = new String[this.nonTermList.size()][this.termList.size()+2];
+      String[] entetes = new String[termList.size()+2];
+      entetes[0] = " ";
+      for(int l=0;l<this.termList.size();l++)
+      {
+        entetes[l+1] = this.termList.get(l);
       }
+      entetes[entetes.length-1]="$";
+
+      for(int i=0;i<this.nonTermList.size();i++)
+      {
+        String nonTerm = this.nonTermList.get(i);
+        tableAnalyseTab[i][0]=nonTerm;
+        MyKey cle;
+        for(int j=0;j<this.termList.size();j++)
+        {
+          String term = this.termList.get(j);
+          cle = new MyKey(nonTerm,term);
+          if(this.tableAnalyse.containsKey(cle))
+            tableAnalyseTab[i][j+1]= this.tableAnalyse.get(cle).equals(epsilon)?"epsilon":this.tableAnalyse.get(cle);
+          else
+            tableAnalyseTab[i][j+1]=" ";
+        }
+        cle = new MyKey(nonTerm,"$");
+        if(this.tableAnalyse.containsKey(cle))
+          tableAnalyseTab[i][tableAnalyseTab[i].length-1]= this.tableAnalyse.get(cle).equals(epsilon)?"epsilon":this.tableAnalyse.get(cle);
+        else
+          tableAnalyseTab[i][tableAnalyseTab[i].length-1]=" ";
+
+      }
+      FenetreAnalyse fenetre = new FenetreAnalyse(tableAnalyseTab,entetes);
+      fenetre.makeVisible();
+
+    }
+
+
+  /*
+  =======================
+  */
+
+  /**
+  *Fonction qui retourne une liste contenant tout les terminaux
+  *qui commencent par s
+  *@param String s le préfixe
+  *@return La liste correspondante
+  */
+
+  public List<String> getAllTermStartWith(String s)
+  {
+    return this.termList.stream()
+                        .filter(term -> term.startsWith(s))
+                        .collect(Collectors.toList());
   }
 
+  /**
+  *Fonction qui retourne une liste contenant tout les non-terminaux
+  *qui commencent par s
+  *@param String s le préfixe
+  *@return La liste correspondante
+  */
 
+  public List<String> getAllNonTermStartWith(String s)
+  {
+    return this.nonTermList.stream()
+                        .filter(term -> term.startsWith(s))
+                        .collect(Collectors.toList());
+  }
 
-    public List<String> calculSousPremier3(String rule)
+  /**
+  *Fonction qui check si dans une liste donnée,
+  *il existe un String qui a pour préfixe "s"
+  *@param String s le préfixe
+  *@param list la liste à vérifier
+  *@return true si la liste en contient bien un
+  */
+
+  public boolean containsStartWith(String s,List<String> list)
+  {
+    return list.stream().filter(t -> t.startsWith(s)).collect(Collectors.toList()).size() > 0;
+  }
+
+  /**
+  *Fonction qui dans une liste donnée, renvoie le choix parfait
+  *ie: si deux String dans la liste ont le même préfixe on avance jusqu'à
+  *que la chaîne corresponde à un unique String dans la liste choices
+  *@param String s la chaine
+  *@param choices la liste dans laquelle on récupère le choix
+  *@return String le bon String
+  */
+
+  public String findGoodChoice(String s,List<String> choices)
+  {
+    int i=1;
+    boolean bool= true;
+    while(bool && i<s.length())
     {
-      List<String> ensReturn = new ArrayList<String>();
-      if(!rule.equals(epsilon))
-      {
-        List<String> premierFirst = new ArrayList<String>();
-        int sizeToCut = -1;
-        System.out.println("Calcul Sous premier "+rule);
+      i++;
+      bool = containsStartWith(s.substring(0,i),choices);
 
-        do {
+      //System.out.println("I"+i+" substring "+s.substring(0,i));
+    }
+    final int j = !bool?i-1:i;
+    // System.out.println("SUBSTRING "+s.substring(0,j));
+     String t = choices.stream()
+                       .filter(c -> c.equals(s.substring(0,j)))
+                       .findAny()
+                       .get();
+      //System.out.println("findGoodChoice returns "+t);
+      return t;
+  }
 
-          String firstTerm = this.getFirst(rule);
-          System.out.println("FIRST TERM "+firstTerm);
-          do {
-            premierFirst = ensPremier.get(firstTerm);
-            if(premierFirst==null)
-            {
-              List<String> intermediate = new ArrayList<>();
-              for(String regles : this.reglesProd.get(firstTerm))
-              {
-                intermediate.addAll(calculSousPremier3(regles));
-              }
-              this.ensPremier.put(firstTerm,intermediate);
-            }
-          } while (premierFirst==null);
-
-
-          ensReturn.addAll(premierFirst);
-          sizeToCut = firstTerm.length();
-          rule = rule.substring(sizeToCut);
-
-        }while(premierFirst.contains(epsilon) && sizeToCut!=rule.length());
-
-        if(sizeToCut!=rule.length())
-          ensReturn.remove(epsilon);
-      }
-      else
-        ensReturn.add(epsilon);
-
-      return ensReturn;
+  /**
+  *Fonction qui renvoie le premier terminal ou non terminal d'un String
+  *@param String s la chaine à analyser
+  *@return String le premier de la chaine s'il existe, null sinon
+  */
+  public String getFirst(String s)
+  {
+    List<String> listPossible = new ArrayList<>();
+    String inter = s;
+    //System.out.println("DANS GET FIRST "+inter);
+    if(s.length()>0)
+    {
+    listPossible = getAllTermStartWith(inter.substring(0,1));
+    if(listPossible.size()>1)
+    {
+      //System.out.println("On est bien lo1");
+      return findGoodChoice(inter,listPossible);
+    }else if(listPossible.size()==1)
+    {
+      return listPossible.get(0);
     }
 
-    public List<String> calculSousPremier(String rule)
+    listPossible = getAllNonTermStartWith(inter.substring(0,1));
+    if(listPossible.size()>1)
     {
-      List<String> ensReturn = new ArrayList<String>();
-      if(!rule.equals(epsilon))
-      {
-        List<String> premierFirst = new ArrayList<String>();
-        int sizeToCut = -1;
-        //System.out.println("Calcul Sous premier "+rule);
-
-        do {
-
-          String firstTerm = this.getFirst(rule);
-          System.out.println("FIRST TERM "+firstTerm);
-          if(!this.termList.contains(firstTerm))
-          {
-          do {
-            premierFirst = ensPremier.get(firstTerm);
-            System.out.println("ENS PREMIER DE "+firstTerm);
-              //System.out.println("Premier is empty");
-              List<String> intermediate = new ArrayList<>();
-              for(String regles : this.reglesProd.get(firstTerm))
-              {
-                //System.out.println("Calcul premier de "+regles);
-                List<String> premiertest = new ArrayList<>();
-                if(!getFirst(regles).equals(firstTerm))
-                {
-                if(!this.ensPremier.containsKey(regles))
-                {
-                  premiertest = calculSousPremier(regles);
-                  this.ensPremier.put(regles,premiertest);
-                }
-                else
-                  premiertest = this.ensPremier.get(regles);
-                intermediate.addAll(premiertest);
-                }
-                //printEnsPremier(regles,this.ensPremier.get(regles));
-              }
-              this.ensPremier.put(firstTerm,intermediate);
-
-          } while (premierFirst.isEmpty());
-        }
-
-          ensReturn.addAll(premierFirst);
-          sizeToCut = firstTerm.length();
-          rule = rule.substring(sizeToCut);
-
-        }while(premierFirst.contains(epsilon) && sizeToCut!=rule.length());
-
-        if(sizeToCut!=rule.length())
-          ensReturn.remove(epsilon);
-      }
-      else
-        ensReturn.add(epsilon);
-
-      return ensReturn;
+      //System.out.println("On est bien lo");
+      return findGoodChoice(inter,listPossible);
     }
-
-    public void calculPremierTest()
+    else if(listPossible.size()==1)
     {
-      for(int i=0;i<this.termList.size();i++)
-      {
-        String stringTerm = this.termList.get(i);
-        List<String> ens = new ArrayList<String>();
-        ens.add(stringTerm);
-        ensPremier.put(stringTerm,ens);
-        //printEnsPremier(stringTerm,this.ensPremier.get(stringTerm));
-      }
-      boolean termToAdd = true;
-      while(termToAdd)
-      {
-        for(int j=0;j<this.nonTermList.size();j++)
-        {
-          String stringNt = this.nonTermList.get(j);
-          List<String> ensNt = new ArrayList<String>();
-          List<String> prodNt = this.reglesProd.get(stringNt);
-          //System.out.println("On calcule Premier de "+stringNt);
-          for(int k=0;k<prodNt.size();k++)
-          {
-              String prod = prodNt.get(k);
-              List<String> premierProd = new ArrayList<>();
-              if(!this.ensPremier.containsKey(prod))
-              {
-                premierProd = calculSousPremier(prod);
-                this.ensPremier.put(prod,premierProd);
-                System.out.println("On a ajouté à "+prod);
-                printEnsPremier(prod,premierProd);
-                //printEnsPremier(prod,this.ensPremier.get(prod));
-              }
-              termToAdd = addAllIfAbsent(ensNt,this.ensPremier.get(prod));
-
-
-            }
-            System.out.println("On ajoute à stringNt");
-            printEnsPremier(stringNt,ensNt);
-            //this.ensPremier.(stringNt,ensNt);
-            termToAdd = addAllIfAbsent(this.ensPremier.get(stringNt),ensNt);
-        }
-
-        }
+      return listPossible.get(0);
     }
+  }
+    return null;
+  }
 
-    public void calculSousPremier2(String rule1)
-    {
+  /**
+  *Fonction qui calcule Premier(rule1) et le stocke dans ensPremier
+  */
+
+  public void calculSousPremier2(String rule1)
+  {
       String rule = rule1;
       List<String> ensReturn = new ArrayList<String>();
       if(!rule.equals(epsilon))
       {
         List<String> premierFirst = new ArrayList<String>();
         int sizeToCut = -1;
-        System.out.println("Calcul Sous premier "+rule);
 
         do {
-
+          //Premier terme de la règle
           String firstTerm = this.getFirst(rule);
-          //System.out.println("FIRST TERM "+firstTerm);
-          if(this.ensPremier.containsKey(firstTerm))
+          if(this.ensPremier.containsKey(firstTerm)) //Si Premier(terme) existe déjà
           {
             premierFirst = ensPremier.get(firstTerm);
             addAllIfAbsent(ensReturn,premierFirst);
@@ -419,7 +326,6 @@ public class Grammaire
           {
             for(String regles:this.reglesProd.get(firstTerm))
             {
-              System.out.println("On est dans la regle "+regles);
               if(!this.ensPremier.containsKey(regles))
                 calculSousPremier2(regles);
               addAllIfAbsent(ensReturn,this.ensPremier.get(regles));
@@ -437,7 +343,6 @@ public class Grammaire
       }
       else
         ensReturn.add(epsilon);
-      printEnsPremier(rule1,ensReturn);
 
       if(this.ensPremier.containsKey(rule1))
         addAllIfAbsent(ensReturn,this.ensPremier.get(rule1));
@@ -446,8 +351,13 @@ public class Grammaire
 
     }
 
-    public void calculPremier()
-    {
+  /**
+  *Fonction qui calcule l'ensemble des ensembles Premier
+  *des terminaux et non-terminaux
+  */
+
+  public void calculPremier()
+  {
       for(int i=0;i<this.termList.size();i++)
       {
         String stringTerm = this.termList.get(i);
@@ -461,7 +371,7 @@ public class Grammaire
       {
         for(int j=0;j<this.nonTermList.size();j++)
         {
-          System.out.println("Calcul premier de "+this.nonTermList.get(j));
+          //System.out.println("Calcul premier de "+this.nonTermList.get(j));
           String stringNt = this.nonTermList.get(j);
           List<String> ensNt = new ArrayList<String>();
           List<String> prodNt = this.reglesProd.get(stringNt);
@@ -474,14 +384,19 @@ public class Grammaire
             termToAdd = addAllIfAbsent(this.ensPremier.get(stringNt),this.ensPremier.get(prod));
           }
         }
-        System.out.println("ETAT PREMIER : ");
-        printAllPremier();
+        //System.out.println("ETAT PREMIER : ");
+        //printAllPremier();
 
         }
     }
 
-    public String getFirstNonTerm(String rule)
-    {
+  /**
+  *Fonction qui renvoie le premier non terminal d'un String
+  *@param rule le string
+  *@return String le non terminal, null sinon
+  */
+  public String getFirstNonTerm(String rule)
+  {
       String s = getFirst(rule);
       //System.out.println("DANS NON TERM "+s);
       if(s==null)
@@ -489,17 +404,15 @@ public class Grammaire
       return this.nonTermList.contains(s)?s:getFirstNonTerm(rule.substring(s.length()));
     }
 
-    public String getFirstNonTerm2(String rule)
-    {
-      String s = getFirst(rule);
-        System.out.println("DANS NON TERM "+s);
-        if(s==null)
-          return null;
-        return this.nonTermList.contains(s)?s:getFirstNonTerm(rule.substring(s.length()));
-    }
+  /**
+  *Fonction qui ajoute tous les éléments <ABSENTS> d'une liste dans l'autre
+  *@param listB la liste à ajouter dans
+  *@param listA
+  *@return booleen vrai si l'on a bien ajouté des éléments à listA
+  */
 
-    public boolean addAllIfAbsent(List<String> listA,List<String> listB)
-    {
+  public boolean addAllIfAbsent(List<String> listA,List<String> listB)
+  {
       boolean ret = false;
       for(String s : listB)
       {
@@ -517,53 +430,11 @@ public class Grammaire
       return true;
     }
 
-
-
-
-    public void calculSuivant2()
-    {
-      ensSuivant.get(axiome).add("$");
-      boolean termToAdd = true;
-      do{
-          for(int i=0;i<this.nonTermList.size();i++)
-          {
-            String stringNt = this.nonTermList.get(i);
-            List<String> prodNt = this.reglesProd.get(stringNt);
-
-            for(int j=0;j<prodNt.size();j++)
-            {
-              String prod = prodNt.get(j);
-              String firstNT = "";
-              do {
-                firstNT = getFirstNonTerm(prod);
-                //System.out.println("FirstNT dans suivnat "+firstNT);
-                if(firstNT != null && prod!=null)
-                {
-                  //System.out.println("prod avant cut "+prod+" index :"+prod.indexOf(firstNT));
-                  prod = prod.substring(prod.indexOf(firstNT)+firstNT.length());
-                  List<String> sousPrem = new ArrayList<>();
-                  //System.out.println("Prod dans suivant "+prod);
-                  if(!ensPremier.containsKey(prod))
-                    sousPrem = calculSousPremier(prod);
-                  else
-                    sousPrem = ensPremier.get(prod);
-                  termToAdd = addAllIfAbsent(this.ensSuivant.get(firstNT),sousPrem);
-                  if(sousPrem.contains(epsilon) || prod.length()==0)
-                  {
-                    this.ensSuivant.get(firstNT).remove(epsilon);
-                    termToAdd = addAllIfAbsent(this.ensSuivant.get(firstNT),this.ensSuivant.get(stringNt));
-                  }
-                }
-              } while (firstNT!=null);
-            }
-          }
-
-        }while(termToAdd);
-
-    }
-
-    public void calculSuivant()
-    {
+  /**
+  *Fonction qui calcule tous les ensembles Suivant
+  */
+  public void calculSuivant()
+  {
       ensSuivant.get(axiome).add("$");
       boolean termToAdd = true;
       do{
@@ -602,21 +473,12 @@ public class Grammaire
 
     }
 
-    public void printTableAnalyse()
-    {
-      System.out.println("\nTable d'analyse : \n");
-      Set<MyKey> keys = this.tableAnalyse.keySet();
-      for(String nTerm : this.nonTermList)
-      {
-        keys.stream()
-            .filter(t -> t.getNonTerm().equals(nTerm))
-            .forEach(r -> System.out.println(r.getNonTerm()+" | "+(r.getTerm().equals(epsilon)?"£":r.getTerm())+" --- "+(this.tableAnalyse.get(r).equals(epsilon)?"epsilon":this.tableAnalyse.get(r))));
-      }
-      System.out.println("");
-    }
+  /**
+  *Fonction qui construit la table d'analyse de la Grammaire
+  */
 
-    public void construireTableAnalyse()
-    {
+  public void construireTableAnalyse()
+  {
       for(String nTerm : this.nonTermList)
       {
         List<String> listProd = this.reglesProd.get(nTerm);
@@ -647,8 +509,13 @@ public class Grammaire
       }
     }
 
-    public boolean checkTermChaine(String chaine)
-    {
+  /**
+  *Fonction qui check si une chaine ne contient bien uniquement que des
+  *terminaux de la liste des Terminaux
+  *sinon, pas besoin de l'analyser..
+  */
+  public boolean checkTermChaine(String chaine)
+  {
       boolean check = true;
       String term ="";
       while(check && chaine.length()>0)
@@ -668,8 +535,15 @@ public class Grammaire
       return true;
     }
 
-    public boolean analyseChaine(String chaine,boolean affiche)
-    {
+  /**
+  *Fonction qui analyse une chaine
+  *@param String chaine la chaine à analyser
+  *@param boolean affiche booleen true si on veut afficher les étapes
+  *@return bool true si la chaine appartient à L(Grammaire)
+  */
+
+  public boolean analyseChaine(String chaine,boolean affiche)
+  {
       chaine = chaine.replace(" ","");
       if(!checkTermChaine(chaine))
         return false;
