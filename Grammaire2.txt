@@ -1,0 +1,97 @@
+S
+program
+ident
+begin
+end.
+while
+do
+to
+end
+for
+from
+then
+if
+else
+true
+false
+not
+or
+and
+break
++
+-
+;
+*
+/
+<=
+<
+>
+>=
+=
+!=
+<-
+(
+)
+[
+]
+entier
+.
+S ->
+| programidentbeginLIend.
+LI-> 
+| I;LI
+| I
+I ->
+| Affectation
+| While
+| For
+| If
+| break
+Affectation ->
+| ident<-Expression
+| ident<-ValBool
+While ->
+| while BExpression do LI end
+For ->
+| for ident from Valeur to Valeur do LI end
+If ->
+| if BExpression then LI else LI end
+ValBool ->
+|true
+|false
+BExpression->
+|ValBool
+|not BExpression
+|BExpression or BExpression
+|BExpression and BExpression
+|Condition
+|(BExpression)
+Expression ->
+|Expression OpArith Expression
+|(Expression)
+|VarNum
+OpArith-> 
+|+
+|-
+|*
+|/
+VarNum->
+|ident
+|ident [Expression]
+|Expression
+|entier
+Valeur->
+|ident
+|entier
+Condition->
+|VarNum OpRel VarNum
+OpRel->
+|<=
+|<
+|>
+|>=
+|=
+|!=
+.end
+
+

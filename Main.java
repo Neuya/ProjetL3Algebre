@@ -30,6 +30,10 @@ public class Main
       Map<String,List<String>> mapTest = new HashMap<String,List<String>>();
       mapTest.put("S",Arrays.asList("aSbS","bSaS",epsi));*/
 
+      String t = "E";
+      System.out.println("START"+t.startsWith("E'"));
+      System.out.println("SUB "+t.substring(0,0));
+
       Grammaire gram = new Grammaire("E");
       gram.defineTerm(Arrays.asList("x","0","1","+","*","(",")"));
       gram.defineNonTerm(Arrays.asList("E","R","T","V","F"));
@@ -43,18 +47,19 @@ public class Main
       gram.defineReglesProd(mapTest);
       gram.printGrammaire();
       gram.calculPremier();
+      gram.printAllPremier();
       gram.calculSuivant();
       gram.printAllSuivant();
       gram.construireTableAnalyse();
       gram.printTableAnalyse();
-      System.out.println("ANALYSE : "+gram.analyseChaine("x*(x+1)+x"));
+      System.out.println("ANALYSE : "+gram.analyseChaine("x*(x+1)"));
       Menu menu = new Menu();
       /*Grammaire gram3 = new Grammaire("S");
       try{
         gram3 = menu.constructGrammaireFile();
       }catch(Exception e)
       {
-        e.printStackTrace();
+        e.printStackT'ace();
       }
       gram3.calculPremier();
       gram3.calculSuivant();
@@ -65,7 +70,7 @@ public class Main
       gram2.calculSuivant();
       gram2.printAllSuivant();
     //  gram.printAllEnsPremier();*/
-      String choice = menu.makeChoice();
+    /*  String choice = menu.makeChoice();
       if(choice.equals("1"))
       {
         Grammaire gram2 = menu.constructGrammaire();
@@ -77,17 +82,18 @@ public class Main
           gram3 = menu.constructGrammaireFile();
         }catch(Exception e)
         {
-          e.printStackTrace();
+          e.printStackT'ace();
         }
         gram3.calculPremier();
         gram3.calculSuivant();
         gram3.printAllSuivant();
         gram3.construireTableAnalyse();
         gram3.printTableAnalyse();
-        System.out.println("ANALYSE : "+gram3.analyseChaine("aabb"));
+        System.out.println("ANALYSE : "+gram3.analyseChaine("aabb"));*/
+
+        menu.menuPrincipal();
       }
 
 
 
   }
-}

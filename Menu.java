@@ -7,6 +7,12 @@ import java.io.*;
 
 public class Menu
 {
+  private Grammaire gram;
+
+  public Menu()
+  {
+    gram = new Grammaire("");
+  }
   public String printQuestion(String question)
   {
     System.out.println(question);
@@ -14,9 +20,78 @@ public class Menu
     return sc.nextLine();
   }
 
-  public String makeChoice()
+  public boolean checkChoice(String n,int a,int b)
   {
-    return printQuestion("Que voulez vous faire? \n1.Créer une grammaire manuellement \n2.Créer une grammaire à partir du fichier Grammaire.txt \n3.Analyser le programme ALGO.txt");
+    Integer in = Integer.parseInt(n.trim());
+    return in>=a && in<=b;
+  }
+
+  public void menuPrincipal()
+  {
+    String choice="";
+    do
+    {
+      choice = this.makeChoicePrincipal();
+    }while(!checkChoice(choice,1,3));
+    if(choice.equals("1"))
+       gram = this.constructGrammaire();
+    if(choice.equals("2"))
+    {
+      try{
+        gram = this.constructGrammaireFile();
+      }catch(Exception e){
+        e.printStackTrace();
+      }
+    }
+    System.out.println("Grammaire bien créée!");
+    if(doWhileNotYn("Voulez vous afficher la grammaire?").equals("y"))
+      gram.printGrammaire();
+
+    gram.calculPremier();
+    //gram.printAllPremier();
+    gram.calculSuivant();
+    //gram.printAllSuivant();
+    gram.construireTableAnalyse();
+      //gram.printTableAnalyse();
+    this.menuGrammaire();
+  }
+
+  public void menuGrammaire()
+  {
+    String choice = this.makeChoiceGrammaire();
+    while(!choice.equals("4"))
+    {
+      if(choice.equals("1"))
+      {
+        gram.printAllPremier();
+        gram.printAllSuivant();
+      }
+      if(choice.equals("2"))
+      {
+        gram.printTableAnalyse();
+      }
+      if(choice.equals("3"))
+      {
+        String chaine = printQuestion("Entrez la chaîne à analyser : ");
+        System.out.println(gram.analyseChaine(chaine)?"Cette chaîne appartient bien à L(grammaire)!\n":"Cette chaîne n'appartient pas à L(grammaire)...\n");
+      }
+      choice = this.makeChoiceGrammaire();
+    }
+  }
+
+  public String makeChoiceGrammaire()
+  {
+    String question = "Quelle action souhaitez vous effectuer sur votre grammaire?\n";
+    question+= "  1. Afficher les ensembles premiers et suivants\n";
+    question+= "  2. Afficher la table d'analyse (générée à la construction de la grammaire)\n";
+    question+= "  3. Analyser si une chaîne de caractères appartient à L(grammaire)\n";
+    question+= "  4. Quitter le programme";
+    return printQuestion(question);
+  }
+
+  public String makeChoicePrincipal()
+  {
+    return printQuestion("Que voulez vous faire?\n  1.Créer une grammaire manuellement\n  2.Créer une grammaire à partir du fichier Grammaire.txt\n  3.Analyser le programme ALGO.txt");
   }
 
   public boolean checkChar(char c,char a,char z)
@@ -69,7 +144,7 @@ public class Menu
 
   public Grammaire constructGrammaireFile() throws Exception
   {
-    File file = new File("Grammaire.txt");
+    File file = new File("Grammaire2.txt");
 
     BufferedReader br = new BufferedReader(new FileReader("Grammaire.txt"));
 
@@ -91,8 +166,7 @@ public class Menu
     st = br.readLine();
     while(!st.equals(".end"))
     {
-      String nTerm = st.replace(" ->","").replace("->","");
-      System.out.println("NTERM "+nTerm);
+      String nTerm = st.replace(" ->","").replace("->","").replace(" ","");
       listNonTerm.add(nTerm);
       st = br.readLine();
       List<String> listRules = new ArrayList<>();
@@ -109,8 +183,6 @@ public class Menu
     gram.defineTerm(listTerm);
     gram.defineNonTerm(listNonTerm);
     gram.defineReglesProd(mapRegles);
-    System.out.println("GRAMMAIRE FICHIER");
-    gram.printGrammaire();
     return gram;
   }
 
