@@ -8,14 +8,6 @@ public class Main
 
       String test = "program p1\nbegin\nz <- x ;\nx <- y ;\ny <- z\nend.";
 
-      Automate autoEntier = Fonctions.makeAutomateEntier();
-      Automate autoIdent = Fonctions.makeAutomateIdent();
-
-
-      System.out.println(Fonctions.TransformAlgo(autoEntier,autoIdent,test));
-
-
-
       /*Grammaire gram = new Grammaire("S");
 
 
@@ -30,7 +22,7 @@ public class Main
       Map<String,List<String>> mapTest = new HashMap<String,List<String>>();
       mapTest.put("S",Arrays.asList("aSbS","bSaS",epsi));*/
 
-      String t = "E";
+      /*String t = "E";
       System.out.println("START"+t.startsWith("E'"));
       System.out.println("SUB "+t.substring(0,0));
 
@@ -52,47 +44,11 @@ public class Main
       gram.printAllSuivant();
       gram.construireTableAnalyse();
       gram.printTableAnalyse();
-      System.out.println("ANALYSE : "+gram.analyseChaine("x*(x+1)"));
+      System.out.println("ANALYSE : "+gram.analyseChaine("x*(x+1)",true));*/
       Menu menu = new Menu();
-      /*Grammaire gram3 = new Grammaire("S");
-      try{
-        gram3 = menu.constructGrammaireFile();
-      }catch(Exception e)
-      {
-        e.printStackT'ace();
-      }
-      gram3.calculPremier();
-      gram3.calculSuivant();
-      gram3.printAllSuivant();
-      Grammaire gram2 = menu.constructGrammaire();
-      gram2.printGrammaire();
-      gram2.calculPremier();
-      gram2.calculSuivant();
-      gram2.printAllSuivant();
-    //  gram.printAllEnsPremier();*/
-    /*  String choice = menu.makeChoice();
-      if(choice.equals("1"))
-      {
-        Grammaire gram2 = menu.constructGrammaire();
-      }
-      if(choice.equals("2"))
-      {
-        Grammaire gram3 = new Grammaire("");
-        try{
-          gram3 = menu.constructGrammaireFile();
-        }catch(Exception e)
-        {
-          e.printStackT'ace();
-        }
-        gram3.calculPremier();
-        gram3.calculSuivant();
-        gram3.printAllSuivant();
-        gram3.construireTableAnalyse();
-        gram3.printTableAnalyse();
-        System.out.println("ANALYSE : "+gram3.analyseChaine("aabb"));*/
 
-        menu.menuPrincipal();
-      }
+      menu.menuPrincipal();
+    }
 
 
 

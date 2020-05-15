@@ -67,19 +67,19 @@ public class Automate{
 
     for(int i=0;i<tabChar.length;i++)
     {
-      System.out.println("Lettre Courante : "+tabChar[i]+" Etat : "+etatcourant.getNum());
+      //System.out.println("Lettre Courante : "+tabChar[i]+" Etat : "+etatcourant.getNum());
       if(etatcourant.isInTransitions(tabChar[i]))
       {
         etatcourant = etatcourant.retSuivant(tabChar[i]);
-        System.out.println("====> "+etatcourant.getNum());
+        //System.out.println("====> "+etatcourant.getNum());
       }
       else
       {
-        System.out.println("non reconnu");
+        //System.out.println("non reconnu");
         return false;
       }
     }
-    System.out.println("Plus de characteres, Etat Final : "+etatcourant.getNum());
+    //System.out.println("Plus de characteres, Etat Final : "+etatcourant.getNum());
     return etatcourant.isFinal();
   }
 

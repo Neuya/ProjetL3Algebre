@@ -38,9 +38,11 @@ entier
 .
 S ->
 | programidentbeginLIend.
-LI-> 
-| I;LI
-| I
+LI->
+| ILI'
+LI'->
+|epsilon
+|;LI
 I ->
 | Affectation
 | While
@@ -48,8 +50,10 @@ I ->
 | If
 | break
 Affectation ->
-| ident<-Expression
-| ident<-ValBool
+| identAff'
+Aff'->
+|Expression
+|BExpression
 While ->
 | while BExpression do LI end
 For ->
@@ -60,26 +64,34 @@ ValBool ->
 |true
 |false
 BExpression->
-|ValBool
-|not BExpression
-|BExpression or BExpression
-|BExpression and BExpression
-|Condition
-|(BExpression)
+|notBExpressionB'
+|ConditionB'
+|(BExpression)B'
+|ValBoolB'
+B'->
+|BExpress'B'
+|epsilon
+BExpress'
+|orBExpression
+|andBExpression
 Expression ->
-|Expression OpArith Expression
-|(Expression)
-|VarNum
-OpArith-> 
+|(Expression)E'
+|VarNumE'
+E'->
+|OpArithExpressionE'
+|epsilon
+OpArith->
 |+
 |-
 |*
 |/
 VarNum->
-|ident
-|ident [Expression]
+|ident VarNum'
 |Expression
 |entier
+VarNum'->
+|epsilon
+|[Expression]
 Valeur->
 |ident
 |entier
@@ -93,5 +105,3 @@ OpRel->
 |=
 |!=
 .end
-
-

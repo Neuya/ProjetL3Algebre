@@ -40,7 +40,7 @@ public class Fonctions
     return automateI;
   }
 
-  public static List<String> listKeyWords = Arrays.asList("program","end.","while","for","begin","true","then","false","break","if","do","not","or","and","from");
+  public static List<String> listKeyWords = Arrays.asList("program","end.","while","for","begin","true","then","false","break","if","do","not","or","and","from","end");
 
   public static String TransformAlgo(Automate autoEntier,Automate autoIdent,String programme)
   {
@@ -51,6 +51,7 @@ public class Fonctions
     {
       //System.out.println(strTok.nextToken());
       stringCur = strTok.nextToken();
+      //System.out.println("Analyse de "+stringCur);
       if(!listKeyWords.contains(stringCur))
       {
         if(autoEntier.checkStr(stringCur))
